@@ -1,0 +1,55 @@
+[
+    {"name": "Serve", "id": "SERVE", "merger":  false, "frozen": "top"},
+    {
+        "name": "Countertop", "id": "COUNTER", "expanded": true, "children": [
+            {"name": "Countertop 1", "id": "COUNTER1", "merger":  true},
+            {"name": "Countertop 2", "id": "COUNTER2", "merger":  true},
+            {"name": "Countertop 3", "id": "COUNTER3", "merger":  true}
+        ]
+    },
+    {
+        "name": "Stove", "id": "STOVE", "expanded": false, "children": [
+            {"name": "Low", "id": "STOVE_LOW", "merger":  true},
+            {"name": "Medium-Low", "id": "STOVE_MEDLOW", "merger":  true},
+            {"name": "Medium", "id": "STOVE_MED", "merger":  true},
+            {"name": "Medium-High", "id": "STOVE_MEDHI", "merger":  true},
+            {"name": "High", "id": "STOVE_HI", "merger":  true}
+        ]
+    },
+    {
+        "name": "Oven", "id": "OVEN", "expanded": false, "children": [
+            {"name": "Low (0-150 C; 300 F)", "id": "OVEN_LOW", "merger":  true},
+            {"name": "Medium (150-199 C; 400 F)", "id": "OVEN_MED", "merger":  true},
+            {"name": "High (200-250 C; 480 F)", "id": "OVEN_HI", "merger":  true},
+            {"name": "Grill", "id": "OVEN_G", "merger":  true}
+        ]
+    },
+    {
+        "name": "Refrigerator", "id": "REF", "expanded": false, "children": [
+            {"name": "Chill", "id": "REF_CHIL", "merger":  false},
+            {"name": "Freeze", "id": "REF_FRZ", "merger":  false}
+        ]
+    },
+    {
+        "name": "Sink", "id": "FAUCET", "expanded": false, "children": [
+            {"name": "Faucet On (for washing)", "id": "FAUCET_ON", "merger":  false},
+            {"name": "Faucet Off (for draining)", "id": "FAUCET_OFF", "merger":  false}
+        ]
+    },
+    {"name": "MicroWave", "id": "APPL_MICRO", "merger":  false},
+    {"name": "Slicer (for cutting)", "id": "APPL_SLICE", "merger":  false},
+    {"name": "Food Processor (for grinding)", "id": "APPL_PROCESSOR", "merger":  true},
+    {"name": "Blender", "id": "APPL_BLEND", "merger":  true},
+    {"name": "Trash Bin", "id": "TRASH"},
+    {
+        "name": "Validation", "id": "VALID", "expanded": false, "children": [
+            {"name": "Unused", "id": "VALID_UNUSED", "merger":  false},
+            {"name": "Mixture 1", "id": "VALID_MIX1", "merger":  false},
+            {"name": "Mixture 2", "id": "VALID_MIX2", "merger":  false},
+            {"name": "Mixture 3", "id": "VALID_MIX3", "merger":  false},
+            {"name": "Mixture 4", "id": "VALID_MIX4", "merger":  false},
+            {"name": "Mixture 5", "id": "VALID_MIX5", "merger":  false}
+
+        ]
+    }
+]
