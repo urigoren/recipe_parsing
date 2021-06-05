@@ -28,7 +28,6 @@ with open("../data/res2idx.json", 'r') as f:
         k+=1
 with open("../data/arg2idx.json", 'r') as f:
     for w,i in json.load(f).items():
-#         output_vocab[w] = k
         output_vocab[w.replace('-','_')] = k
         k+=1
 

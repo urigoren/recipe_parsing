@@ -2,20 +2,6 @@
 <project version="4">
   <component name="PublishConfigData" autoUpload="Always" serverName="ubuntu@34.241.225.80:22" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="ubuntu@18.194.86.252:22">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="ubuntu@18.198.1.210:22">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/tmp/pycharm_project_317" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="ubuntu@34.241.225.80:22">
         <serverdata>
           <mappings>
