@@ -26,7 +26,7 @@ class Encoder(pl.LightningModule):
         self.transformer = nn.TransformerEncoder(encoder_layer, num_transformer_layers)
         self.max_length=max_length
 
-    def forward(self, inp, mask):
+    def forward(self, inp, mask=None):
         output = self.embedding(inp)
         # output = output.view(-1, self.max_length*self.embedding.embedding_dim)
         # output = self.transformer(output, mask)
@@ -49,29 +49,29 @@ class Decoder(pl.LightningModule):
 
 
 class Seq2Seq(pl.LightningModule):
-    def __init__(self, input_vocab, output_vocab, input_max_length, output_max_length, embedding_dim=512,
+    def __init__(self, n_tokens_input, n_tokens_output, input_max_length, output_max_length, embedding_dim=512,
                  num_transformer_layers=4,nheads=8):
         super().__init__()
-        n_tokens = 128
-        hid_size = 12
         #TODO: use parameters for all the arguments
-        self.encoder = Encoder(n_embeddings=len(output_vocab),max_length=input_max_length, embedding_dim=embedding_dim, num_transformer_layers=num_transformer_layers,nheads=nheads)
-        self.decoder = Decoder(hid_size, n_tokens)
+        self.encoder = Encoder(n_embeddings=n_tokens_input,max_length=input_max_length, embedding_dim=embedding_dim, num_transformer_layers=num_transformer_layers,nheads=nheads)
+        self.decoder = Decoder(embedding_dim, n_tokens_output)
+        self.n_tokens_output = n_tokens_output
 
-    def forward(self, enc_out, enc_hid):
+    def forward(self, inp):
         # in lightning, forward defines the prediction/inference actions
-        out, hid = self.encoder(enc_out, enc_hid)
+        out = self.decoder(self.encoder(inp))
         return out
 
     def training_step(self, batch, batch_idx):
         # training_step defined the train loop. It is independent of forward
         x, y = batch
-        x = x.view(x.size(0), -1)
-        z = self.forward(x)
-        x_hat = self.decoder(z)
-        loss = nn.NLLLoss(x_hat, x)
+        # y = F.one_hot(y.T.to(torch.int64), self.n_tokens_output).to(torch.float32)
+        y=y.to(torch.long)
+        y_hat = self.forward(x)
+        y_hat = y_hat.view(y.shape[0], -1, y.shape[1])
+        loss = nn.CrossEntropyLoss()
         #self.log('train_loss', loss)
-        return loss
+        return loss(y_hat,y)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
@@ -130,7 +130,6 @@ def load_data_and_preprocess(csv_file, output_vocab, max_size=128):
     return df
 
 
-
 if __name__ == "__main__":
     max_length = 64
     output_vocab, id_types = unified_vocab()
@@ -141,15 +140,15 @@ if __name__ == "__main__":
     output_attention =  torch.Tensor(np.vstack(df["output_attention"])).type(torch.bool)
 
 
-    enc = Encoder(n_embeddings=len(output_vocab) ,max_length=max_length, embedding_dim=512, num_transformer_layers=4,nheads=8)
-    # ret= enc(output_ids, None)
-    ret= enc(output_ids, output_attention)
-    print (ret)
-    print("="*88)
-    dataset = TensorDataset(tensor_x, tensor_y)  # create your datset
-    # my_dataloader = DataLoader(my_dataset) # create your dataloader
-    train, val = random_split(dataset, [int(X.shape[0]*0.9), X.shape[0]-int(X.shape[0]*0.9)])
+    # enc = Encoder(n_embeddings=len(output_vocab) ,max_length=max_length, embedding_dim=512, num_transformer_layers=4,nheads=8)
+    # dec = Decoder(512, len(output_vocab))
+    # ret= enc(output_ids, output_attention)
+    # ret = dec(ret)
+    # print (ret)
+    dataset = TensorDataset(output_ids, output_ids)  # create your datset
+    my_dataloader = DataLoader(dataset) # create your dataloader
+    train, val = random_split(dataset, [int(output_ids.shape[0]*0.9), output_ids.shape[0]-int(output_ids.shape[0]*0.9)])
 
-    seq2seq = Seq2Seq()
+    seq2seq = Seq2Seq(len(output_vocab),len(output_vocab),max_length,max_length)
     trainer = pl.Trainer()
     trainer.fit(seq2seq, DataLoader(train), DataLoader(val))
