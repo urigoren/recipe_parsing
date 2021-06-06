@@ -1,7 +1,7 @@
 import json
 import numpy as np
 import pandas as pd
-from transformers import BertLMHeadModel, BertTokenizer
+from transformers import T5Tokenizer, BertTokenizer
 
 def unified_vocab():
     output_vocab = {
@@ -33,7 +33,7 @@ def unified_vocab():
     return output_vocab, id_types
 
 
-def load_data_and_preprocess(csv_file, output_vocab, max_size=128):
+def load_data_and_preprocess(csv_file, output_vocab, max_size=128, tokenization='bert-base-uncased'):
     def output_tokenize(s):
         ret = [1]
         for w in s.split():
@@ -45,7 +45,12 @@ def load_data_and_preprocess(csv_file, output_vocab, max_size=128):
         lst = np.array(lst)
         lst = np.pad(lst, (0,max_size-len(lst)))
         return lst
-    input_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+    input_tokenizer = None
+    if tokenization.startswith('bert'):
+        input_tokenizer = BertTokenizer.from_pretrained(tokenization)
+    elif tokenization.startswith('t5'):
+        input_tokenizer = T5Tokenizer.from_pretrained(tokenization)
     df = pd.read_csv(csv_file)
     df["output_attention"] = df["output_seq"].apply(lambda s: pad(np.ones(len(s.split()))).astype('int'))
     df["output_ids"] = df["output_seq"].apply(output_tokenize)
