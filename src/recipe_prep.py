@@ -32,6 +32,32 @@ def unified_vocab():
     output_vocab = {w: i for i, w in enumerate(output_vocab)}
     return output_vocab, id_types
 
+def t5_extra_vocab(extra_start = 32000):
+    output_vocab = {
+        "PUT": extra_start,
+        "REMOVE": extra_start+1,
+        "USE": extra_start+2,
+        "STOP_USING": extra_start+3,
+        "CHEF_CHECK": extra_start+4,
+        "CHEF_DO": extra_start+5,
+        "MOVE_CONTENTS": extra_start+6,
+    }
+    id_types = {'commands': list(output_vocab.values()), 'resources': [], 'args': []}
+    k = extra_start+len(output_vocab)
+    with open("../data/res2idx.json", 'r') as f:
+        for w, i in json.load(f).items():
+            output_vocab[w] = k
+            id_types['resources'].append(k)
+            k += 1
+    with open("../data/arg2idx.json", 'r') as f:
+        for w, i in json.load(f).items():
+            #         output_vocab[w] = k
+            output_vocab[w.replace('-', '_')] = k
+            id_types['args'].append(k)
+            k += 1
+
+    output_vocab = {w: i for i, w in enumerate(output_vocab)}
+    return output_vocab, id_types
 
 def load_data_and_preprocess(csv_file, output_vocab, max_size=128, tokenization='bert-base-uncased'):
     def output_tokenize(s):
