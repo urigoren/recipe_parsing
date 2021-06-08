@@ -38,7 +38,7 @@ class RecipeDataModule(pl.LightningDataModule):
     def __init__(self, csv_file,max_length = 64, batch_size=1):
         super().__init__()
         self.batch_size = batch_size
-        output_vocab, id_types = t5_extra_vocab()
+        output_vocab, id_types = t5_extra_vocab(31000)
         df = load_data_and_preprocess(csv_file, output_vocab, max_size=max_length)
         self.dataset_length = len(df)
         input_ids =         torch.Tensor(np.vstack(df["input_ids"])).type(torch.long)
@@ -100,9 +100,11 @@ class T5FineTune(pl.LightningModule):
 
 
 if __name__ == "__main__":
+    T5_MODEL = 't5-small'
+    # T5_MODEL = 't5-large'
     recipe_datamodule = RecipeDataModule(csv_file='../data/seq2seq_4335716.csv')
-    tokenizer = T5Tokenizer.from_pretrained('t5-small')
-    model = T5Recipe.from_pretrained('t5-small', return_dict=True)
+    tokenizer = T5Tokenizer.from_pretrained(T5_MODEL)
+    model = T5Recipe.from_pretrained(T5_MODEL, return_dict=True)
     model.set_generation_constraints([[1], [1,2], [1], [1,2],
                                       # [1], [1,2], [1], [1,2],
                                       # [1], [1,2], [1], [1,2],
@@ -118,4 +120,4 @@ if __name__ == "__main__":
     trainer = pl.Trainer(max_epochs=1)
     t5finetune = T5FineTune(model)
     trainer.fit(t5finetune, recipe_datamodule)
-    t5finetune.save("/home/ugoren/trained_models/recipe")
+    t5finetune.save("/home/ubuntu/trained_models/recipe")

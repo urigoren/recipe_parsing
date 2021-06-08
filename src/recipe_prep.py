@@ -32,6 +32,7 @@ def unified_vocab():
     output_vocab = {w: i for i, w in enumerate(output_vocab)}
     return output_vocab, id_types
 
+
 def t5_extra_vocab(extra_start = 32000):
     output_vocab = {
         "PUT": extra_start,
@@ -56,7 +57,6 @@ def t5_extra_vocab(extra_start = 32000):
             id_types['args'].append(k)
             k += 1
 
-    output_vocab = {w: i for i, w in enumerate(output_vocab)}
     return output_vocab, id_types
 
 def load_data_and_preprocess(csv_file, output_vocab, max_size=128, tokenization='bert-base-uncased'):
