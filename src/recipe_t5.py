@@ -19,7 +19,6 @@ class T5Recipe(T5ForConditionalGeneration):
         return self.constraints
 
     def generate(self, **kwargs):
-        print("BOOM")
         scores = super().generate(
             return_dict_in_generate=True,
             output_scores=True,
@@ -62,6 +61,7 @@ class RecipeDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         return DataLoader(self.test_data, batch_size=self.batch_size)
 
+
 class T5FineTune(pl.LightningModule):
     def __init__(self, model):
         super().__init__()
@@ -99,12 +99,10 @@ class T5FineTune(pl.LightningModule):
         self.model.save_pretrained(p)
 
 
-if __name__ == "__main__":
-    T5_MODEL = 't5-small'
-    # T5_MODEL = 't5-large'
-    recipe_datamodule = RecipeDataModule(csv_file='../data/seq2seq_4335716.csv')
-    tokenizer = T5Tokenizer.from_pretrained(T5_MODEL)
-    model = T5Recipe.from_pretrained(T5_MODEL, return_dict=True)
+def main(params):
+    recipe_datamodule = RecipeDataModule(csv_file=params.data)
+    tokenizer = T5Tokenizer.from_pretrained(params.token_model)
+    model = T5Recipe.from_pretrained(params.load_model, return_dict=True)
     model.set_generation_constraints([[1], [1,2], [1], [1,2],
                                       # [1], [1,2], [1], [1,2],
                                       # [1], [1,2], [1], [1,2],
@@ -117,7 +115,21 @@ if __name__ == "__main__":
     print (outputs)
 
 
-    trainer = pl.Trainer(max_epochs=1)
+    trainer = pl.Trainer(max_epochs=10)
     t5finetune = T5FineTune(model)
     trainer.fit(t5finetune, recipe_datamodule)
-    t5finetune.save("/home/ubuntu/trained_models/recipe")
+    t5finetune.save(params.save_model)
+    return 0
+
+
+if __name__ == "__main__":
+    import sys, os
+    from argparse import ArgumentParser
+    argparse = ArgumentParser()
+    argparse.add_argument('--data', type=str, default='../data/seq2seq_4335716.csv')
+    argparse.add_argument('--token_model', type=str, default='t5-large')
+    argparse.add_argument('--load_model', type=str, default='t5-large')
+    argparse.add_argument('--save_model', type=str, default='/home/ubuntu/trained_models/recipe_large_20')
+    argparse.add_argument('--max_epochs', type=int, default=10)
+    sys.exit(main(argparse.parse_args()))
+
